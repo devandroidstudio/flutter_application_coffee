@@ -22,10 +22,12 @@ class CoffeeProvider extends ChangeNotifier {
 
   void _coffeeScrollListener() {
     currentPgae.value = pageCoffeeController.page!;
+    notifyListeners();
   }
 
   void _textScrollListener() {
     textPage.value = pageTextController.page!;
+    notifyListeners();
   }
 
   void dispose() {

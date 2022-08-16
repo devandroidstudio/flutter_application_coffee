@@ -3,12 +3,20 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_coffee/auth_page/main_page.dart';
 import 'package:flutter_application_coffee/helper/routes.dart';
+import 'package:flutter_application_coffee/view_models/login-register/coffee_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseAuth.instance.setPersistence(Persistence.NONE);
-  runApp(const MyApp());
+  // await FirebaseAuth.instance.setPersistence(Persistence.NONE);
+  runApp(
+    MultiProvider(providers: [
+      ChangeNotifierProvider(
+        create: (_) => CoffeeProvider(),
+      ),
+    ], child: const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {

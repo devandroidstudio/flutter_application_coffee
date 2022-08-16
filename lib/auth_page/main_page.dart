@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_coffee/auth_page/auth_page.dart';
-import 'package:flutter_application_coffee/screens/home/home_page.dart';
+import 'package:flutter_application_coffee/screens/home/components/body_home_page.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -14,7 +14,7 @@ class MainPage extends StatelessWidget {
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return const HomePage();
+                return const MainCoffeeConcept();
               } else {
                 return const AuthPage();
               }

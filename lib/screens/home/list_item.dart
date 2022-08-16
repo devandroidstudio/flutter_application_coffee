@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_coffee/helper/animated_page.dart';
 import 'package:flutter_application_coffee/model/coffee.dart';
@@ -20,33 +21,82 @@ class CoffeeConceptList extends StatefulWidget {
 }
 
 class _CoffeeConceptListState extends State<CoffeeConceptList> {
+  final user = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return Consumer<CoffeeProvider>(builder: (context, bloc, child) {
       return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-        floatingActionButton: Neumorphic(
-          style: const NeumorphicStyle(
-              surfaceIntensity: 0.5,
-              boxShape: NeumorphicBoxShape.circle(),
-              depth: 10,
-              intensity: 0.8,
-              shape: NeumorphicShape.flat),
-          child: NeumorphicButton(
-            minDistance: -10,
-            onPressed: () {
-              z.toggle!();
-            },
-            style: const NeumorphicStyle(
-                boxShape: NeumorphicBoxShape.circle(),
-                color: Colors.white,
-                depth: 10,
-                intensity: 0.8,
-                shape: NeumorphicShape.convex),
-            child: const Icon(Icons.menu),
-          ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Neumorphic(
+              style: const NeumorphicStyle(
+                  surfaceIntensity: 0.5,
+                  boxShape: NeumorphicBoxShape.circle(),
+                  depth: 10,
+                  intensity: 0.8,
+                  shape: NeumorphicShape.flat),
+              child: NeumorphicButton(
+                minDistance: -10,
+                onPressed: () {
+                  z.toggle!();
+                },
+                style: const NeumorphicStyle(
+                    boxShape: NeumorphicBoxShape.circle(),
+                    color: Colors.white,
+                    depth: 10,
+                    intensity: 0.8,
+                    shape: NeumorphicShape.convex),
+                child: const Icon(Icons.menu),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey, width: 1),
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              // foregroundDecoration: BoxDecoration(
+              //   border: Border.all(
+              //     color: Colors.grey,
+              //     width: 1,
+              //   ),
+              //   color: Colors.transparent,
+              //   borderRadius: BorderRadius.circular(20),
+              // ),
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    radius: 15,
+                    backgroundColor: Colors.white,
+                    child: user!.photoURL != null
+                        ? Icon(
+                            Icons.person,
+                            color: Colors.black,
+                          )
+                        : Image.network(
+                            filterQuality: FilterQuality.high,
+                            'https://img.icons8.com/office/2x/guest-male.png',
+                            fit: BoxFit.scaleDown,
+                          ),
+                  ),
+                  Text(
+                    'Welcome, ${user?.email}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
         ),
         body: SafeArea(
           child: Padding(

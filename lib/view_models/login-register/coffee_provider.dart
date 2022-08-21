@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 const double _initalPage = 8.0;
 
 class CoffeeProvider extends ChangeNotifier {
+  late AnimationController controller;
   final pageCoffeeController =
       PageController(viewportFraction: 0.35, initialPage: _initalPage.toInt());
   final pageTextController = PageController(initialPage: _initalPage.toInt());
@@ -37,7 +38,7 @@ class CoffeeProvider extends ChangeNotifier {
     pageTextController.dispose();
   }
 
-  static CoffeeProvider? of(BuildContext context) {
-    return Provider.of<CoffeeProvider>(context, listen: false);
-  }
+  // static CoffeeProvider? of(BuildContext context) {
+  //   return Provider.of<CoffeeProvider>(context, listen: false);
+  // }
 }

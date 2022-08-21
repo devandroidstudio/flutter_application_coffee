@@ -76,7 +76,7 @@ class _CoffeeConceptDetailsState extends State<CoffeeConceptDetails>
           ),
           padding: const EdgeInsets.all(12.0),
           child: const Icon(
-            Icons.arrow_circle_left,
+            Icons.arrow_back_ios_new,
             color: Colors.black,
           ),
         ),

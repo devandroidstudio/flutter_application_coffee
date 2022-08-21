@@ -13,19 +13,24 @@ import 'package:provider/provider.dart';
 const _duration = Duration(milliseconds: 500);
 
 class CoffeeConceptList extends StatefulWidget {
-  const CoffeeConceptList(ZoomDrawerController? z, {Key? key})
-      : super(key: key);
+  final ZoomDrawerController z;
+  const CoffeeConceptList({Key? key, required this.z}) : super(key: key);
 
   @override
   State<CoffeeConceptList> createState() => _CoffeeConceptListState();
 }
 
 class _CoffeeConceptListState extends State<CoffeeConceptList> {
+  @override
+  void initState() {
+    context.read<CoffeeProvider>().init();
+    super.initState();
+  }
+
   final user = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
     return Consumer<CoffeeProvider>(builder: (context, bloc, child) {
       return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
@@ -56,46 +61,45 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
             Container(
               margin: const EdgeInsets.only(right: 10),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey, width: 1),
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(20),
               ),
-              // foregroundDecoration: BoxDecoration(
-              //   border: Border.all(
-              //     color: Colors.grey,
-              //     width: 1,
-              //   ),
-              //   color: Colors.transparent,
-              //   borderRadius: BorderRadius.circular(20),
-              // ),
-              child: Row(
-                children: <Widget>[
-                  CircleAvatar(
-                    radius: 15,
-                    backgroundColor: Colors.white,
-                    child: user!.photoURL != null
-                        ? Icon(
-                            Icons.person,
-                            color: Colors.black,
-                          )
-                        : Image.network(
-                            filterQuality: FilterQuality.high,
-                            'https://img.icons8.com/office/2x/guest-male.png',
-                            fit: BoxFit.scaleDown,
+              child: StreamBuilder<User?>(
+                  stream: FirebaseAuth.instance.userChanges(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Row(
+                        children: <Widget>[
+                          CircleAvatar(
+                            radius: 15,
+                            backgroundColor: Colors.white,
+                            child: user!.photoURL == null
+                                ? const Icon(
+                                    Icons.person,
+                                    color: Colors.black,
+                                  )
+                                : Image.network(
+                                    filterQuality: FilterQuality.high,
+                                    '${snapshot.data!.photoURL}',
+                                    fit: BoxFit.scaleDown,
+                                  ),
                           ),
-                  ),
-                  Text(
-                    'Welcome, ${user?.email}',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                          Text(
+                            'Welcome, ${snapshot.data!.displayName}',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  }),
+            ),
           ],
         ),
         body: SafeArea(
@@ -103,6 +107,13 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
             padding: const EdgeInsets.only(top: 20),
             child: Stack(
               children: <Widget>[
+                Positioned(
+                  top: size.height * 0.05,
+                  left: 0,
+                  right: 0,
+                  height: 100,
+                  child: const _CoffeeHeader(),
+                ),
                 Positioned(
                   left: 20,
                   right: 20,
@@ -141,7 +152,7 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
                             return const SizedBox.shrink();
                           } else if (index > coffees.length + 1) {
                             // print(index);
-                            createRoute(context, const TestAPI());
+                            // createRoute(context, const TestAPI());
                           }
                           final coffee = coffees[index - 1];
                           final result = currentPgae - index + 1;
@@ -193,12 +204,71 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
                   },
                 ),
                 Positioned(
-                  top: size.height * 0.05,
-                  left: 0,
-                  right: 0,
-                  height: 100,
-                  child: const _CoffeeHeader(),
-                )
+                  right: size.width * 0.05,
+                  bottom: size.width * 0.05,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 1.0, end: 0.0),
+                    builder: (context, value, child) {
+                      return Transform.translate(
+                        offset: Offset(200 * value, 240 * value),
+                        child: child,
+                      );
+                    },
+                    duration: const Duration(milliseconds: 880),
+                    child: Stack(
+                      children: [
+                        Neumorphic(
+                          style: const NeumorphicStyle(
+                              surfaceIntensity: 0.5,
+                              boxShape: NeumorphicBoxShape.circle(),
+                              depth: 10,
+                              intensity: 0.8,
+                              shadowLightColor: Colors.brown,
+                              oppositeShadowLightSource: true,
+                              lightSource: LightSource.bottomRight,
+                              shape: NeumorphicShape.flat),
+                          child: NeumorphicButton(
+                            minDistance: -10,
+                            onPressed: () {},
+                            style: const NeumorphicStyle(
+                                boxShape: NeumorphicBoxShape.circle(),
+                                color: Colors.white,
+                                depth: 10,
+                                intensity: 0.8,
+                                shape: NeumorphicShape.convex),
+                            child: const Icon(
+                              Icons.shopping_bag_outlined,
+                              size: 30,
+                              color: Colors.brown,
+                            ),
+                          ),
+                        ),
+                        // Contador Carrito
+                        Positioned(
+                          top: 2,
+                          right: 2,
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.deepOrange,
+                            ),
+                            alignment: Alignment.center,
+                            child: const Text(
+                              '10',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -259,7 +329,6 @@ class _CoffeeHeader extends StatelessWidget {
                     },
                   ),
                 ),
-                const SizedBox(height: 10),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 500),
                   transitionBuilder:

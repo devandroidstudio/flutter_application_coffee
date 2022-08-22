@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_coffee/auth_page/main_page.dart';
 import 'package:flutter_application_coffee/helper/routes.dart';
 import 'package:flutter_application_coffee/view_models/login-register/coffee_provider.dart';
+import 'package:flutter_application_coffee/view_models/main_provider/account_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -13,6 +14,9 @@ void main() async {
     MultiProvider(providers: [
       ChangeNotifierProvider(
         create: (_) => CoffeeProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => UpdateUser(),
       ),
     ], child: const MyApp()),
   );

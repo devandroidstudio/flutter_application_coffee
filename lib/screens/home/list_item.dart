@@ -72,19 +72,18 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
                     if (snapshot.hasData) {
                       return Row(
                         children: <Widget>[
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Colors.white,
-                            child: user!.photoURL == null
-                                ? const Icon(
-                                    Icons.person,
-                                    color: Colors.black,
-                                  )
-                                : Image.network(
-                                    filterQuality: FilterQuality.high,
-                                    '${snapshot.data!.photoURL}',
-                                    fit: BoxFit.scaleDown,
-                                  ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: CircleAvatar(
+                              radius: 15,
+                              backgroundColor: Colors.white,
+                              foregroundImage: user!.photoURL == null
+                                  ? const NetworkImage(
+                                      'https://img.icons8.com/pastel-glyph/2x/person-male--v3.png')
+                                  : NetworkImage(
+                                      '${snapshot.data!.photoURL}',
+                                    ),
+                            ),
                           ),
                           Text(
                             'Welcome, ${snapshot.data!.displayName}',

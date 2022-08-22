@@ -1,9 +1,14 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_coffee/screens/profile/components/item_profile.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
+const double fontSize = 15.0;
 Future updateUser(
     BuildContext context,
     String user,
@@ -21,7 +26,7 @@ Future updateUser(
             timeInSecForIosWeb: 1,
             backgroundColor: Colors.red,
             textColor: Colors.white,
-            fontSize: 12.0);
+            fontSize: fontSize);
       } else {
         Fluttertoast.showToast(
             msg: "Update email success",
@@ -31,7 +36,7 @@ Future updateUser(
             backgroundColor: Colors.green,
             textColor: Colors.white,
             webShowClose: true,
-            fontSize: 16.0);
+            fontSize: fontSize);
       }
 
       Navigator.of(context).pop();
@@ -74,7 +79,7 @@ Future updateUser(
             timeInSecForIosWeb: 1,
             backgroundColor: Colors.red,
             textColor: Colors.white,
-            fontSize: 12.0);
+            fontSize: fontSize);
       } else {
         Fluttertoast.showToast(
             msg: "Update user name success",
@@ -84,7 +89,7 @@ Future updateUser(
             backgroundColor: Colors.green,
             textColor: Colors.white,
             webShowClose: true,
-            fontSize: 16.0);
+            fontSize: fontSize);
       }
       Navigator.of(context).pop();
     }).catchError((e) {
@@ -124,7 +129,7 @@ Future updateUser(
           backgroundColor: Colors.green,
           textColor: Colors.white,
           webShowClose: true,
-          fontSize: 12.0);
+          fontSize: fontSize);
       Navigator.of(context).pop();
     }).catchError((e) {
       showDialog(
@@ -230,11 +235,63 @@ Future reupdate(BuildContext context, String email, String password) async {
 
 class UpdateUser extends ChangeNotifier {
   late String _imageUser;
+  final storageReference = FirebaseStorage.instance.ref('images');
+  late XFile imageFile;
+  final imagePicker = ImagePicker();
+  final user = FirebaseAuth.instance.currentUser;
 
-  String get imageUser => _imageUser;
-
-  set imageUser(String value) {
-    _imageUser = value;
+  void imageFileUpdate(XFile value) {
+    imageFile = value;
     notifyListeners();
+  }
+
+  uploadImage() async {
+    // PickedFile image;
+    //Check Permissions
+    await Permission.photos.request();
+
+    var permissionStatus = await Permission.photos.status;
+
+    if (permissionStatus.isGranted) {
+      await imagePicker.pickImage(source: ImageSource.gallery).then((value) {
+        if (value != null) {
+          imageFileUpdate(value);
+        } else {
+          Fluttertoast.showToast(
+              msg: 'Please select image',
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: fontSize);
+        }
+      });
+      var file = File(imageFile.path);
+
+      if (imageFile.path.isNotEmpty) {
+        storageReference.child(user!.uid).putFile(file).then((value) {
+          value.ref.getDownloadURL().then((value) {
+            _imageUser = value;
+            notifyListeners();
+          }).whenComplete(() {
+            FirebaseAuth.instance.currentUser!.updatePhotoURL(_imageUser);
+          }).onError((error, stackTrace) {
+            Fluttertoast.showToast(
+                msg: 'Error: $error',
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: fontSize);
+          });
+        });
+      } else {
+        print('No Image Path Received');
+      }
+    } else {
+      print('Permission not granted. Try Again with permission access');
+    }
   }
 }

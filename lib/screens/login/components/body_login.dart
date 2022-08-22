@@ -97,6 +97,23 @@ class _BodyLoginState extends State<BodyLogin> {
                       const SizedBox(
                         height: 20,
                       ),
+                      // firebaseUIButton(
+                      //                 context,
+                      //                 'Google',
+                      //                 Colors.black,
+                      //                 'assets/icons/google.png',
+                      //                 Colors.white, () {
+                      //               signInWithGoogle().then((value) {
+                      //                 Navigator.pushReplacement(
+                      //                     context,
+                      //                     MaterialPageRoute(
+                      //                         builder: (context) =>
+                      //                             MainPage()));
+                      //               });
+                      //             }),
+                      const SizedBox(
+                        height: 20,
+                      ),
                       RichText(
                           text: TextSpan(
                         text: 'Don\'t have an account? ',

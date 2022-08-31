@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_coffee/auth_page/main_page.dart';
 import 'package:flutter_application_coffee/helper/keyboard.dart';
 import 'package:flutter_application_coffee/screens/login/components/item_login.dart';
 import 'package:flutter_application_coffee/view_models/login-register/login_register.dart';
@@ -94,6 +95,13 @@ class _BodyLoginState extends State<BodyLogin> {
                         },
                         child: const Text('Sign In'),
                       ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      firebaseUIButton(context, 'Google', Colors.black,
+                          'assets/icons/google.png', Colors.white, () {
+                        signInWithGoogle();
+                      }),
                       const SizedBox(
                         height: 20,
                       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-createRoute(BuildContext context, Widget page) {
+createRoute(Widget page) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => page,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {

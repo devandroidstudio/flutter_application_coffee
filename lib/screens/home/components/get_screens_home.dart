@@ -8,12 +8,16 @@ import 'package:flutter_zoom_drawer/config.dart';
 
 Widget getScreen(DrawerItem currentItem, ZoomDrawerController z) {
   if (currentItem == DrawerListItem.home) {
-    return CoffeeConceptList(z);
+    return CoffeeConceptList(
+      z: z,
+    );
   } else if (currentItem == DrawerListItem.profile) {
     return ProfilePage(z);
   } else if (currentItem == DrawerListItem.settings) {
     return SettingPage(z);
   } else {
-    return CoffeeConceptList(z);
+    return CoffeeConceptList(
+      z: z,
+    );
   }
 }

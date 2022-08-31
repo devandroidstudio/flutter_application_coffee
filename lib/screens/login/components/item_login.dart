@@ -141,7 +141,65 @@ Widget childBackgroundSignIn(BuildContext context) {
   );
 }
 
-// Widget childSignIn()
-// {
-//   return 
-// }
+Container firebaseUIButton(BuildContext context, String title,
+    Color? colorTitle, String? icon, Color color, Function onTap) {
+  return Container(
+    width: MediaQuery.of(context).size.width * 0.55,
+    margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+    decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
+    child: ElevatedButton(
+      onPressed: () {
+        onTap();
+      },
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.resolveWith(
+          (states) {
+            if (states.contains(MaterialState.pressed)) {
+              return color.withOpacity(0.5);
+            }
+            return color;
+          },
+        ),
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+              side: const BorderSide(color: Colors.white)),
+        ),
+      ),
+      child: ListTile(
+        leading: icon.toString().isEmpty
+            ? null
+            : Image.asset(
+                icon!,
+                width: 30,
+                height: 30,
+              ),
+        title: ShaderMask(
+          blendMode: BlendMode.srcIn,
+          shaderCallback: (rect) => icon.toString().isNotEmpty
+              ? const LinearGradient(
+                      colors: [Colors.indigoAccent, Colors.pink],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      tileMode: TileMode.mirror)
+                  .createShader(rect)
+              : LinearGradient(
+                      colors: [colorTitle!, colorTitle],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      tileMode: TileMode.mirror)
+                  .createShader(rect),
+          child: Text(
+            textAlign:
+                icon.toString().isEmpty ? TextAlign.center : TextAlign.left,
+            title,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                fontFamily: 'Roboto'),
+          ),
+        ),
+      ),
+    ),
+  );
+}

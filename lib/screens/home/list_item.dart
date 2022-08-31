@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_coffee/helper/animated_page.dart';
+import 'package:flutter_application_coffee/home_other/home_other_page.dart';
 import 'package:flutter_application_coffee/model/coffee.dart';
 import 'package:flutter_application_coffee/screens/home/components/test.dart';
 import 'package:flutter_application_coffee/screens/home/detail_item.dart';
@@ -12,8 +14,8 @@ import 'package:provider/provider.dart';
 const _duration = Duration(milliseconds: 500);
 
 class CoffeeConceptList extends StatefulWidget {
-  const CoffeeConceptList(ZoomDrawerController? z, {Key? key})
-      : super(key: key);
+  final ZoomDrawerController z;
+  const CoffeeConceptList({Key? key, required this.z}) : super(key: key);
 
   @override
   State<CoffeeConceptList> createState() => _CoffeeConceptListState();
@@ -21,38 +23,112 @@ class CoffeeConceptList extends StatefulWidget {
 
 class _CoffeeConceptListState extends State<CoffeeConceptList> {
   @override
+  void initState() {
+    context.read<CoffeeProvider>().init();
+    super.initState();
+  }
+
+  final user = FirebaseAuth.instance.currentUser;
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
     return Consumer<CoffeeProvider>(builder: (context, bloc, child) {
       return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-        floatingActionButton: Neumorphic(
-          style: const NeumorphicStyle(
-              surfaceIntensity: 0.5,
-              boxShape: NeumorphicBoxShape.circle(),
-              depth: 10,
-              intensity: 0.8,
-              shape: NeumorphicShape.flat),
-          child: NeumorphicButton(
-            minDistance: -10,
-            onPressed: () {
-              z.toggle!();
-            },
-            style: const NeumorphicStyle(
-                boxShape: NeumorphicBoxShape.circle(),
-                color: Colors.white,
-                depth: 10,
-                intensity: 0.8,
-                shape: NeumorphicShape.convex),
-            child: const Icon(Icons.menu),
-          ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const AppBarWidget(),
+            Row(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                        color: Colors.grey.withOpacity(0.5), width: 1),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: StreamBuilder<User?>(
+                      stream: FirebaseAuth.instance.userChanges(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(right: 5),
+                                child: CircleAvatar(
+                                  radius: 15,
+                                  backgroundColor: Colors.white,
+                                  foregroundImage: user!.photoURL == null
+                                      ? const NetworkImage(
+                                          'https://img.icons8.com/pastel-glyph/2x/person-male--v3.png')
+                                      : NetworkImage(
+                                          '${snapshot.data!.photoURL}',
+                                        ),
+                                ),
+                              ),
+                              Text(
+                                'Welcome, ${snapshot.data!.displayName}',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            ],
+                          );
+                        } else {
+                          return const CircularProgressIndicator();
+                        }
+                      }),
+                ),
+                Stack(
+                  children: [
+                    IconButton(
+                        splashRadius: 20,
+                        padding: EdgeInsets.zero,
+                        onPressed: () {},
+                        icon: const Icon(Icons.notifications_active_outlined)),
+                    Positioned(
+                      right: 10,
+                      bottom: 10,
+                      child: Container(
+                        height: 10,
+                        width: 10,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.deepOrange,
+                        ),
+                        alignment: Alignment.center,
+                        // child: const Text(
+                        //   '10',
+                        //   textAlign: TextAlign.center,
+                        //   style: TextStyle(
+                        //     color: Colors.white,
+                        //     fontWeight: FontWeight.bold,
+                        //   ),
+                        // ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ],
         ),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(top: 20),
             child: Stack(
               children: <Widget>[
+                Positioned(
+                  top: size.height * 0.05,
+                  left: 0,
+                  right: 0,
+                  height: 100,
+                  child: const _CoffeeHeader(),
+                ),
                 Positioned(
                   left: 20,
                   right: 20,
@@ -85,22 +161,24 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
                             bloc.pageTextController.animateToPage(value,
                                 duration: _duration, curve: Curves.easeInOut);
                           }
+
+                          if (value >= coffees.length) {
+                            Navigator.of(context)
+                                .push(createRoute(const HomeOtherPage()));
+                          }
                         },
                         itemBuilder: (context, index) {
                           if (index == 0) {
                             return const SizedBox.shrink();
-                          } else if (index > coffees.length + 1) {
-                            // print(index);
-                            createRoute(context, const TestAPI());
                           }
                           final coffee = coffees[index - 1];
                           final result = currentPgae - index + 1;
 
                           final value = -0.4 * result + 1;
                           final opacity = value.clamp(0.0, 1.0);
-
                           return GestureDetector(
                             onTap: () {
+                              z.close!();
                               Navigator.of(context).push(
                                 PageRouteBuilder(
                                   transitionDuration:
@@ -143,18 +221,148 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
                   },
                 ),
                 Positioned(
-                  top: size.height * 0.05,
-                  left: 0,
-                  right: 0,
-                  height: 100,
-                  child: const _CoffeeHeader(),
-                )
+                  right: size.width * 0.05,
+                  bottom: size.width * 0.05,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 1.0, end: 0.0),
+                    builder: (context, value, child) {
+                      return Transform.translate(
+                        offset: Offset(200 * value, 240 * value),
+                        child: child,
+                      );
+                    },
+                    duration: const Duration(milliseconds: 880),
+                    child: Stack(
+                      children: [
+                        Neumorphic(
+                          style: const NeumorphicStyle(
+                              surfaceIntensity: 0.5,
+                              boxShape: NeumorphicBoxShape.circle(),
+                              depth: 10,
+                              intensity: 0.8,
+                              shadowLightColor: Colors.brown,
+                              oppositeShadowLightSource: true,
+                              lightSource: LightSource.bottomRight,
+                              shape: NeumorphicShape.flat),
+                          child: NeumorphicButton(
+                            minDistance: -10,
+                            onPressed: () {
+                              Navigator.push(context, createRoute(TestAPI()));
+                            },
+                            style: const NeumorphicStyle(
+                                boxShape: NeumorphicBoxShape.circle(),
+                                color: Colors.white,
+                                depth: 10,
+                                intensity: 0.8,
+                                shape: NeumorphicShape.convex),
+                            child: const Icon(
+                              Icons.shopping_bag_outlined,
+                              size: 30,
+                              color: Colors.brown,
+                            ),
+                          ),
+                        ),
+                        // Contador Carrito
+                        Positioned(
+                          top: 2,
+                          right: 2,
+                          child: Container(
+                            height: 20,
+                            width: 20,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.deepOrange,
+                            ),
+                            alignment: Alignment.center,
+                            child: const Text(
+                              '10',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
         ),
       );
     });
+  }
+}
+
+class AppBarWidget extends StatefulWidget {
+  const AppBarWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<AppBarWidget> createState() => _AppBarWidgetState();
+}
+
+class _AppBarWidgetState extends State<AppBarWidget>
+    with TickerProviderStateMixin {
+  late AnimationController _controller;
+
+  late Animation _menuAnimation;
+
+  @override
+  void initState() {
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 3));
+
+    _menuAnimation = Tween(begin: 0.0, end: 25.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.50, curve: Curves.easeOut),
+      ),
+    );
+
+    _controller.forward();
+    _controller.addListener(() {
+      setState(() {});
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Neumorphic(
+      style: const NeumorphicStyle(
+          surfaceIntensity: 0.5,
+          boxShape: NeumorphicBoxShape.circle(),
+          depth: 10,
+          intensity: 0.8,
+          shape: NeumorphicShape.flat),
+      child: NeumorphicButton(
+        minDistance: -10,
+        onPressed: () {
+          z.toggle!();
+        },
+        style: const NeumorphicStyle(
+            boxShape: NeumorphicBoxShape.circle(),
+            color: Colors.white,
+            depth: 10,
+            intensity: 0.8,
+            shape: NeumorphicShape.convex),
+        child: Icon(
+          Icons.menu,
+          size: _menuAnimation.value,
+        ),
+      ),
+    );
   }
 }
 
@@ -170,7 +378,8 @@ class _CoffeeHeader extends StatelessWidget {
         tween: Tween(begin: 1.0, end: 0.0),
         builder: (context, value, child) {
           return Transform.translate(
-            offset: Offset(0.0, -100 * value),
+            filterQuality: FilterQuality.high,
+            offset: Offset(0.0, -120 * value),
             child: child,
           );
         },
@@ -180,8 +389,10 @@ class _CoffeeHeader extends StatelessWidget {
           builder: (context, textPage, _) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Expanded(
+                  flex: 2,
                   child: PageView.builder(
                     allowImplicitScrolling: true,
                     itemCount: coffees.length,
@@ -202,24 +413,27 @@ class _CoffeeHeader extends StatelessWidget {
                                   .textTheme
                                   .headline4
                                   ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                             ),
                           ));
                     },
                   ),
                 ),
-                const SizedBox(height: 10),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 500),
-                  transitionBuilder:
-                      (Widget child, Animation<double> animation) {
-                    return ScaleTransition(scale: animation, child: child);
-                  },
-                  child: Text(
-                    '\$${coffees[textPage.toInt()].price.toStringAsFixed(2)}',
-                    key: ValueKey<String>(coffees[textPage.toInt()].name),
-                    style: Theme.of(context).textTheme.headline4,
+                Expanded(
+                  flex: 1,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                      return ScaleTransition(scale: animation, child: child);
+                    },
+                    child: Text(
+                      '\$${coffees[textPage.toInt()].price.toStringAsFixed(2)}',
+                      key: ValueKey<String>(coffees[textPage.toInt()].name),
+                      style: Theme.of(context).textTheme.headline4,
+                    ),
                   ),
                 ),
               ],

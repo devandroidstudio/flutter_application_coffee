@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_coffee/auth_page/main_page.dart';
 import 'package:flutter_application_coffee/model/drawer_item.dart';
 import 'package:flutter_application_coffee/repo/list_drawer_item.dart';
 import 'package:flutter_application_coffee/screens/home/components/get_screens_home.dart';
 import 'package:flutter_application_coffee/screens/home/components/menu_home.dart';
+import 'package:flutter_application_coffee/view_models/login-register/login_register.dart';
 import 'package:flutter_zoom_drawer/config.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
         onItemTap: (DrawerItem item) {
           if (item == DrawerListItem.logout) {
             setState(() {
-              FirebaseAuth.instance.signOut();
+              signOut();
               Navigator.pushReplacementNamed(context, MainPage.routeName);
             });
           }

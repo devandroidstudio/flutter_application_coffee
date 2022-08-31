@@ -28,6 +28,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // showSemanticsDebugger: true,
+      // showPerformanceOverlay: true,
       initialRoute: MainPage.routeName,
       routes: routes,
       title: 'Flutter Demo',

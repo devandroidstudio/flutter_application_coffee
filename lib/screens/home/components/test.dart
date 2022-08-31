@@ -1,18 +1,30 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class TestAPI extends StatelessWidget {
+class TestAPI extends StatefulWidget {
   const TestAPI({Key? key}) : super(key: key);
+
+  @override
+  State<TestAPI> createState() => _TestAPIState();
+}
+
+class _TestAPIState extends State<TestAPI> {
+  Map<String, dynamic> datas = {};
+  Future<dynamic> texttesting(String uid) async {
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get()
+        .then((value) => value.data()!['phone'])
+        .toString();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Text(
-            'Test API',
-            style: TextStyle(color: Colors.black),
-          ),
-        ),
+      appBar: AppBar(
+        title: Text(FirebaseAuth.instance.currentUser!.uid),
       ),
     );
   }

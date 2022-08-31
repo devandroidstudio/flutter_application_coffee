@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -17,17 +18,18 @@ Future updateUser(
     TextEditingController passwordController) async {
   final formKey = GlobalKey<FormState>();
   if (title.contains('Email')) {
-    await FirebaseAuth.instance.currentUser!.updateEmail(user).then((value) {
-      if (FirebaseAuth.instance.currentUser!.email == user) {
-        Fluttertoast.showToast(
-            msg: 'Update is failure. Email is exist',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: fontSize);
-      } else {
+    if (FirebaseAuth.instance.currentUser!.email == user) {
+      Fluttertoast.showToast(
+          msg: 'Update is failure. Email is exist',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: fontSize);
+      Navigator.of(context).pop();
+    } else {
+      await FirebaseAuth.instance.currentUser!.updateEmail(user).then((value) {
         Fluttertoast.showToast(
             msg: "Update email success",
             toastLength: Toast.LENGTH_SHORT,
@@ -37,50 +39,49 @@ Future updateUser(
             textColor: Colors.white,
             webShowClose: true,
             fontSize: fontSize);
-      }
-
-      Navigator.of(context).pop();
-    }).catchError((e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Warning'),
-          content: Form(
-            key: formKey,
-            child: textFormFielAuth(
-                emailController: emailController,
-                passwordController: passwordController,
-                error: e.toString().split(']')[1]),
-          ),
-          actions: [
-            ElevatedButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+        Navigator.of(context).pop();
+      }).catchError((e) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Warning'),
+            content: Form(
+              key: formKey,
+              child: textFormFielAuth(
+                  emailController: emailController,
+                  passwordController: passwordController,
+                  error: e.toString().split(']')[1]),
             ),
-            ButtonAuth(
-                formKey: formKey,
-                emailController: emailController,
-                passwordController: passwordController),
-          ],
-        ),
-      );
-    });
+            actions: [
+              ElevatedButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              ButtonAuth(
+                  formKey: formKey,
+                  emailController: emailController,
+                  passwordController: passwordController),
+            ],
+          ),
+        );
+      });
+    }
   } else if (title.contains('User Name')) {
-    await FirebaseAuth.instance.currentUser!
-        .updateDisplayName(user)
-        .then((value) {
-      if (FirebaseAuth.instance.currentUser!.displayName == user) {
-        Fluttertoast.showToast(
-            msg: 'Update is failure. User name is exist',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: fontSize);
-      } else {
+    if (FirebaseAuth.instance.currentUser!.displayName == user) {
+      Fluttertoast.showToast(
+          msg: 'Update is failure. User name is exist',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: fontSize);
+    } else {
+      await FirebaseAuth.instance.currentUser!
+          .updateDisplayName(user)
+          .then((value) {
         Fluttertoast.showToast(
             msg: "Update user name success",
             toastLength: Toast.LENGTH_SHORT,
@@ -90,35 +91,35 @@ Future updateUser(
             textColor: Colors.white,
             webShowClose: true,
             fontSize: fontSize);
-      }
-      Navigator.of(context).pop();
-    }).catchError((e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Warning'),
-          content: Form(
-            key: formKey,
-            child: textFormFielAuth(
-                emailController: emailController,
-                passwordController: passwordController,
-                error: e.toString().split(']')[1]),
-          ),
-          actions: [
-            ElevatedButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+        Navigator.of(context).pop();
+      }).catchError((e) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Warning'),
+            content: Form(
+              key: formKey,
+              child: textFormFielAuth(
+                  emailController: emailController,
+                  passwordController: passwordController,
+                  error: e.toString().split(']')[1]),
             ),
-            ButtonAuth(
-                formKey: formKey,
-                emailController: emailController,
-                passwordController: passwordController),
-          ],
-        ),
-      );
-    });
+            actions: [
+              ElevatedButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              ButtonAuth(
+                  formKey: formKey,
+                  emailController: emailController,
+                  passwordController: passwordController),
+            ],
+          ),
+        );
+      });
+    }
   } else if (title.contains('Password')) {
     await FirebaseAuth.instance.currentUser!.updatePassword(user).then((value) {
       Fluttertoast.showToast(

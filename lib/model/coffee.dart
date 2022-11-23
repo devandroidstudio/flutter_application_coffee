@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_coffee/model/product_cart.dart';
 import 'package:meta/meta.dart';
 
 double _doubleInRange(Random source, num start, num end) =>
@@ -8,11 +9,28 @@ double _doubleInRange(Random source, num start, num end) =>
 final _random = Random();
 final coffees = List.generate(
   _name.length,
-  (index) => Coffee(
+  (index) => Products(
     name: _name[index],
     price: _doubleInRange(_random, 3, 7),
     image: 'assets/images/${index + 1}.png',
+    category: 'coffees',
   ),
+);
+final cakes = List.generate(
+  _nameCake.length,
+  (index) => Products(
+      name: _nameCake[index],
+      price: _doubleInRange(_random, 3, 7),
+      image: 'assets/images_cake/${index + 1}.png',
+      category: 'cakes'),
+);
+final cakesOther = List.generate(
+  _cakeOther.length,
+  (index) => Products(
+      name: _cakeOther[index],
+      price: _doubleInRange(_random, 3, 7),
+      image: 'assets/images_cake_other/${index + 1}.png',
+      category: 'cakes-other'),
 );
 
 final _name = [
@@ -29,11 +47,32 @@ final _name = [
   'Classic Irish Coffee',
   'Toffee Nut Crunch Latte',
 ];
+final _nameCake = [
+  'Mousse Cacao Cake',
+  'Peach Mousse Cake',
+  'Mousse Chocolate Cake',
+  'Coffee Cheese Cake',
+  'Caramel Cheese Cake',
+  'Banana Cake',
+];
+final _cakeOther = [
+  'Banh Mi',
+  'Banh Mi Que Pate',
+  'Banh Mi Que Pate Spicy',
+];
 
-class Coffee {
+class Product {
   final String name;
   final double price;
   final String image;
+  final String category;
+  final String? size;
 
-  const Coffee({required this.name, required this.price, required this.image});
+  Product({
+    required this.name,
+    required this.price,
+    required this.image,
+    required this.category,
+    this.size,
+  });
 }

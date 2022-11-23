@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_coffee/model/coffee.dart';
+import 'package:flutter_application_coffee/model/product_cart.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:hive/hive.dart';
+
+enum CoffeeSizeState {
+  S,
+  M,
+  L,
+}
 
 class CoffeeConceptDetails extends StatefulWidget {
-  final Coffee coffee;
-  const CoffeeConceptDetails({Key? key, required this.coffee})
+  final Products coffee;
+  const CoffeeConceptDetails(
+      {Key? key,
+      required this.coffee,
+      required this.onAddCoffees,
+      required this.onShowCart})
       : super(key: key);
-
+  final Function(Products) onAddCoffees;
+  final VoidCallback onShowCart;
   @override
   State<CoffeeConceptDetails> createState() => _CoffeeConceptDetailsState();
 }
@@ -23,9 +36,19 @@ class _CoffeeConceptDetailsState extends State<CoffeeConceptDetails>
   bool _isElevated = true;
   Offset distaince = const Offset(4, 4);
   double blur = 30;
+  late CoffeeSizeState _state;
+  late Box<CoffeeItems> box;
+  _changeCoffeeState(CoffeeSizeState state) {
+    setState(() {
+      _state = state;
+    });
+  }
+
+  late Products _products;
 
   @override
   void initState() {
+    _state = CoffeeSizeState.S;
     _controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 1000));
 
@@ -64,6 +87,12 @@ class _CoffeeConceptDetailsState extends State<CoffeeConceptDetails>
       setState(() {});
     });
     _isElevated = false;
+  }
+
+  @override
+  void didChangeDependencies() {
+    box = Hive.box<CoffeeItems>('listProductOfCart');
+    super.didChangeDependencies();
   }
 
   @override
@@ -119,7 +148,7 @@ class _CoffeeConceptDetailsState extends State<CoffeeConceptDetails>
                     shape: NeumorphicShape.flat),
                 child: NeumorphicButton(
                   minDistance: -10,
-                  onPressed: () {},
+                  onPressed: () => widget.onShowCart(),
                   style: const NeumorphicStyle(
                       boxShape: NeumorphicBoxShape.circle(),
                       color: Colors.white,
@@ -145,10 +174,15 @@ class _CoffeeConceptDetailsState extends State<CoffeeConceptDetails>
                     color: Colors.deepOrange,
                   ),
                   alignment: Alignment.center,
-                  child: const Text(
-                    '10',
+                  child: Text(
+                    box.values
+                        .fold<int>(
+                            0,
+                            (previousValue, element) =>
+                                previousValue + element.quantity)
+                        .toString(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 12),
@@ -324,9 +358,22 @@ class _CoffeeConceptDetailsState extends State<CoffeeConceptDetails>
                         child: IconButton(
                             splashRadius: 1,
                             onPressed: () {
-                              print(_isElevated);
+                              setState(() {
+                                _products = Products(
+                                    name: widget.coffee.name,
+                                    price: widget.coffee.price,
+                                    image: widget.coffee.image,
+                                    category: widget.coffee.category,
+                                    size: _state.toString());
+                                widget.onAddCoffees(_products);
+                                _controller.reverse();
+                                Navigator.pop(context);
+                              });
                             },
-                            icon: Icon(Icons.add)),
+                            icon: const Icon(
+                              Icons.add,
+                              color: Colors.deepOrange,
+                            )),
                       ),
                     ),
                   ),
@@ -350,47 +397,92 @@ class _CoffeeConceptDetailsState extends State<CoffeeConceptDetails>
                           children: [
                             Column(
                               children: [
-                                SizedBox(
-                                  width: 35,
-                                  height: 35,
-                                  child:
-                                      Image.asset('assets/images/taza_s.png'),
+                                GestureDetector(
+                                  onTap: () =>
+                                      _changeCoffeeState(CoffeeSizeState.S),
+                                  child: SizedBox(
+                                    width: 35,
+                                    height: 35,
+                                    child: _state == CoffeeSizeState.S
+                                        ? Image.asset(
+                                            'assets/images/taza_s.png',
+                                            filterQuality: FilterQuality.high,
+                                            isAntiAlias: true)
+                                        : Image.asset(
+                                            'assets/images/taza_s-uncheck.png',
+                                            filterQuality: FilterQuality.high,
+                                            isAntiAlias: true),
+                                  ),
                                 ),
-                                const Text(
+                                Text(
                                   'S',
-                                  style: TextStyle(fontSize: 22),
+                                  style: TextStyle(
+                                      fontSize: 22,
+                                      color: _state == CoffeeSizeState.S
+                                          ? Colors.black
+                                          : Colors.brown[100]),
                                 ),
                               ],
                             ),
                             const SizedBox(width: 20),
                             Column(
                               children: [
-                                Container(
-                                  width: 45,
-                                  height: 45,
-                                  margin: const EdgeInsets.only(left: 10),
-                                  child:
-                                      Image.asset('assets/images/taza_m.png'),
+                                GestureDetector(
+                                  onTap: () =>
+                                      _changeCoffeeState(CoffeeSizeState.M),
+                                  child: Container(
+                                    width: 45,
+                                    height: 45,
+                                    margin: const EdgeInsets.only(left: 10),
+                                    child: _state == CoffeeSizeState.M
+                                        ? Image.asset(
+                                            'assets/images/taza_m.png',
+                                            filterQuality: FilterQuality.high,
+                                            isAntiAlias: true)
+                                        : Image.asset(
+                                            'assets/images/taza_m-uncheck.png',
+                                            filterQuality: FilterQuality.high,
+                                            isAntiAlias: true),
+                                  ),
                                 ),
-                                const Text(
+                                Text(
                                   'M',
-                                  style: TextStyle(fontSize: 22),
+                                  style: TextStyle(
+                                      fontSize: 22,
+                                      color: _state == CoffeeSizeState.M
+                                          ? Colors.black
+                                          : Colors.brown[100]),
                                 ),
                               ],
                             ),
                             const SizedBox(width: 10),
                             Column(
                               children: [
-                                Container(
-                                  width: 55,
-                                  height: 55,
-                                  margin: const EdgeInsets.only(left: 10),
-                                  child:
-                                      Image.asset('assets/images/taza_l.png'),
+                                GestureDetector(
+                                  onTap: () =>
+                                      _changeCoffeeState(CoffeeSizeState.L),
+                                  child: Container(
+                                    width: 55,
+                                    height: 55,
+                                    margin: const EdgeInsets.only(left: 10),
+                                    child: _state == CoffeeSizeState.L
+                                        ? Image.asset(
+                                            'assets/images/taza_l.png',
+                                            filterQuality: FilterQuality.high,
+                                            isAntiAlias: true)
+                                        : Image.asset(
+                                            'assets/images/taza_l-uncheck.png',
+                                            filterQuality: FilterQuality.high,
+                                            isAntiAlias: true),
+                                  ),
                                 ),
-                                const Text(
+                                Text(
                                   'L',
-                                  style: TextStyle(fontSize: 22),
+                                  style: TextStyle(
+                                      fontSize: 22,
+                                      color: _state == CoffeeSizeState.L
+                                          ? Colors.black
+                                          : Colors.brown[100]),
                                 ),
                               ],
                             ),

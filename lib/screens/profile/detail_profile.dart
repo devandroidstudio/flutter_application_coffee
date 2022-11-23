@@ -112,7 +112,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                     text: widget.title,
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 50,
                   ),
                   MaterialButton(
                       padding: const EdgeInsets.all(0),
@@ -134,8 +134,9 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                         }
                       },
                       child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
+                          alignment: Alignment.center,
+                          width: MediaQuery.of(context).size.width - 50,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
                               boxShadow: [
                                 BoxShadow(
@@ -275,7 +276,7 @@ class _UpdatePhonePageState extends State<UpdatePhonePage> {
         ),
         body: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(vertical: 80),
+            padding: const EdgeInsets.symmetric(vertical: 80),
             primary: true,
             child: Form(
               key: _formKey,

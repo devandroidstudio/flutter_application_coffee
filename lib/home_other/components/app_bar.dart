@@ -2,10 +2,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 class AppBarHomeOtherPage extends StatelessWidget {
-  const AppBarHomeOtherPage({
-    Key? key,
-  }) : super(key: key);
+  const AppBarHomeOtherPage({Key? key, required this.onTapBack})
+      : super(key: key);
+  final VoidCallback onTapBack;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Neumorphic(
+            style: const NeumorphicStyle(
+                surfaceIntensity: 0.5,
+                boxShape: NeumorphicBoxShape.circle(),
+                depth: 10,
+                intensity: 0.8,
+                shape: NeumorphicShape.flat),
+            child: NeumorphicButton(
+              minDistance: -10,
+              onPressed: () {
+                onTapBack();
+                Navigator.pop(context);
+              },
+              style: const NeumorphicStyle(
+                  boxShape: NeumorphicBoxShape.circle(),
+                  color: Colors.white,
+                  depth: 10,
+                  intensity: 0.8,
+                  shape: NeumorphicShape.convex),
+              child: const Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Icon(Icons.arrow_back_ios),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
+class AppBarHomeOtherDetailPage extends StatelessWidget {
+  const AppBarHomeOtherDetailPage(
+      {Key? key, required this.quantity, required this.onShowCart})
+      : super(key: key);
+  final int quantity;
+  final VoidCallback onShowCart;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -50,7 +93,10 @@ class AppBarHomeOtherPage extends StatelessWidget {
                     shape: NeumorphicShape.flat),
                 child: NeumorphicButton(
                   minDistance: -10,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pop(context);
+                    onShowCart();
+                  },
                   style: const NeumorphicStyle(
                       boxShape: NeumorphicBoxShape.circle(),
                       color: Colors.white,
@@ -76,10 +122,10 @@ class AppBarHomeOtherPage extends StatelessWidget {
                     color: Colors.deepOrange,
                   ),
                   alignment: Alignment.center,
-                  child: const Text(
-                    '10',
+                  child: Text(
+                    quantity.toString(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 12),

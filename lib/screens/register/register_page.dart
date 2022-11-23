@@ -2,8 +2,8 @@ import 'package:flutter_application_coffee/screens/register/components/body_regi
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 class RegisterPage extends StatelessWidget {
-  final VoidCallback showLoginPage;
-  const RegisterPage({Key? key, required this.showLoginPage}) : super(key: key);
+  final VoidCallback? showLoginPage;
+  const RegisterPage({Key? key, this.showLoginPage}) : super(key: key);
   static String routeName = '/login';
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class RegisterPage extends StatelessWidget {
         child: NeumorphicButton(
           minDistance: -10,
           onPressed: () {
-            showLoginPage();
+            showLoginPage!();
           },
           style: const NeumorphicStyle(
               boxShape: NeumorphicBoxShape.circle(),

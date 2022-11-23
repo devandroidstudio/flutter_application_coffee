@@ -3,7 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-Future signIn(BuildContext context, String email, String password) async {
+Future signIn(BuildContext context, String email, String password,
+    VoidCallback onLoginSuccess) async {
   showDialog(
       barrierColor: Colors.black.withOpacity(0.5),
       context: context,
@@ -27,6 +28,9 @@ Future signIn(BuildContext context, String email, String password) async {
       .signInWithEmailAndPassword(email: email, password: password)
       .then((value) {
     Navigator.pop(context);
+    onLoginSuccess();
+    Navigator.pushNamedAndRemoveUntil(
+        context, '/main', (route) => route.isCurrent);
   }).catchError((e) {
     if (e.code == 'user-not-found' || e.code == 'wrong-password') {
       Navigator.of(context).pop();

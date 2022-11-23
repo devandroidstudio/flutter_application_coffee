@@ -5,7 +5,7 @@ import 'package:flutter_application_coffee/screens/home/components/body_home_pag
 
 class MainPage extends StatelessWidget {
   const MainPage({Key? key}) : super(key: key);
-  static String routeName = '/';
+  static String routeName = '/main';
   @override
   Widget build(BuildContext context) {
     return Scaffold(

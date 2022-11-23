@@ -3,13 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_coffee/helper/animated_page.dart';
 import 'package:flutter_application_coffee/home_other/home_other_page.dart';
 import 'package:flutter_application_coffee/model/coffee.dart';
+import 'package:flutter_application_coffee/model/product_cart.dart';
 import 'package:flutter_application_coffee/screens/home/components/test.dart';
 import 'package:flutter_application_coffee/screens/home/detail_item.dart';
 import 'package:flutter_application_coffee/screens/home/home_page.dart';
+import 'package:flutter_application_coffee/view_models/login-register/cart_provider.dart';
 import 'package:flutter_application_coffee/view_models/login-register/coffee_provider.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_zoom_drawer/config.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+
+import 'components/bottom_sheet_home_page.dart';
 
 const _duration = Duration(milliseconds: 500);
 
@@ -22,17 +27,27 @@ class CoffeeConceptList extends StatefulWidget {
 }
 
 class _CoffeeConceptListState extends State<CoffeeConceptList> {
+  late Box<CoffeeItems> box;
   @override
   void initState() {
     context.read<CoffeeProvider>().init();
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() {
+    box = Hive.box<CoffeeItems>('listProductOfCart');
+    super.didChangeDependencies();
+  }
+
   final user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Consumer<CoffeeProvider>(builder: (context, bloc, child) {
+
+    return Consumer2<CoffeeProvider, CartProvider>(
+        builder: (context, bloc, blocCart, child) {
       return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
         floatingActionButton: Row(
@@ -164,7 +179,14 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
 
                           if (value >= coffees.length) {
                             Navigator.of(context)
-                                .push(createRoute(const HomeOtherPage()));
+                                .push(createRoute(HomeOtherPage(
+                              onTapBack: () {
+                                bloc.pageCoffeeController.animateToPage(
+                                    value - 1,
+                                    duration: _duration,
+                                    curve: Curves.easeOut);
+                              },
+                            )));
                           }
                         },
                         itemBuilder: (context, index) {
@@ -185,10 +207,23 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
                                       const Duration(milliseconds: 650),
                                   pageBuilder: (context, animation, _) {
                                     return FadeTransition(
-                                        opacity: animation,
-                                        child: CoffeeConceptDetails(
-                                          coffee: coffee,
-                                        ));
+                                      opacity: animation,
+                                      child: CoffeeConceptDetails(
+                                        coffee: coffee,
+                                        onAddCoffees: (values) {
+                                          blocCart.addProduct(values, 1);
+                                        },
+                                        onShowCart: () {
+                                          Future.delayed(
+                                            const Duration(milliseconds: 200),
+                                            () {
+                                              showBottomSheetListItemPage(
+                                                  context);
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    );
                                   },
                                 ),
                               );
@@ -247,7 +282,7 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
                           child: NeumorphicButton(
                             minDistance: -10,
                             onPressed: () {
-                              Navigator.push(context, createRoute(TestAPI()));
+                              showBottomSheetListItemPage(context);
                             },
                             style: const NeumorphicStyle(
                                 boxShape: NeumorphicBoxShape.circle(),
@@ -274,10 +309,15 @@ class _CoffeeConceptListState extends State<CoffeeConceptList> {
                               color: Colors.deepOrange,
                             ),
                             alignment: Alignment.center,
-                            child: const Text(
-                              '10',
+                            child: Text(
+                              box.values
+                                  .fold<int>(
+                                      0,
+                                      (previousValue, element) =>
+                                          previousValue + element.quantity)
+                                  .toString(),
                               textAlign: TextAlign.center,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -392,7 +432,6 @@ class _CoffeeHeader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Expanded(
-                  flex: 2,
                   child: PageView.builder(
                     allowImplicitScrolling: true,
                     itemCount: coffees.length,
@@ -406,7 +445,8 @@ class _CoffeeHeader extends StatelessWidget {
                           child: Hero(
                             tag: "text_${coffees[index].name}",
                             child: Text(
-                              maxLines: 2,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.center,
                               coffees[index].name,
                               style: Theme.of(context)
@@ -422,7 +462,7 @@ class _CoffeeHeader extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  flex: 1,
+                  flex: 2,
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
                     transitionBuilder:
@@ -443,4 +483,16 @@ class _CoffeeHeader extends StatelessWidget {
       );
     });
   }
+}
+
+Future showBottomSheetListItemPage(BuildContext context) async {
+  await showModalBottomSheet(
+    clipBehavior: Clip.hardEdge,
+    shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    context: context,
+    builder: (context) {
+      return const ShowBottomSheetHomePage();
+    },
+  );
 }

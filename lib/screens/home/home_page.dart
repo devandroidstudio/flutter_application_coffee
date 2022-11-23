@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_coffee/auth_page/main_page.dart';
 import 'package:flutter_application_coffee/model/drawer_item.dart';
 import 'package:flutter_application_coffee/repo/list_drawer_item.dart';
 import 'package:flutter_application_coffee/screens/home/components/get_screens_home.dart';
@@ -58,8 +57,13 @@ class _HomePageState extends State<HomePage> {
         onItemTap: (DrawerItem item) {
           if (item == DrawerListItem.logout) {
             setState(() {
-              signOut();
-              Navigator.pushReplacementNamed(context, MainPage.routeName);
+              Future.delayed(
+                const Duration(milliseconds: 200),
+                () {
+                  signOut();
+                  Navigator.maybePop(context);
+                },
+              );
             });
           }
 

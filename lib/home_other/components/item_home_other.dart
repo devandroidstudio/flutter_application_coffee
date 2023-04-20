@@ -76,7 +76,7 @@ class _showListPaymentPageState extends State<showListPaymentPage> {
                   activeColor: Colors.transparent,
                   side: const BorderSide(
                       style: BorderStyle.none,
-                      strokeAlign: StrokeAlign.center,
+                      strokeAlign: BorderSide.strokeAlignCenter,
                       color: Colors.white),
                   secondary: Image.asset(
                     listPayments[index].images,

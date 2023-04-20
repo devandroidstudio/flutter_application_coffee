@@ -462,7 +462,6 @@ class _CoffeeHeader extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  flex: 2,
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
                     transitionBuilder:

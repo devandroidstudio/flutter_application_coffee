@@ -15,6 +15,7 @@ class LoginPage extends StatelessWidget {
       body: SafeArea(
         child: BodyLogin(onPressed: showRegisterPage),
       ),
+      resizeToAvoidBottomInset: false,
       floatingActionButton: Navigator.canPop(context)
           ? Neumorphic(
               style: const NeumorphicStyle(

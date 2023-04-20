@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_coffee/screens/register/components/item_register.dart';
 import 'package:flutter_application_coffee/view_models/login-register/login_register.dart';
 
+import '../../onBoarding/components/child_button.dart';
+
 class BodyRegister extends StatefulWidget {
   const BodyRegister({Key? key}) : super(key: key);
 
@@ -87,22 +89,20 @@ class _BodyRegisterState extends State<BodyRegister> {
                       controller: _confirmPasswordController,
                     ),
                     SizedBox(height: size.height * 0.02),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          if (_passwordController.text ==
-                              _confirmPasswordController.text) {
-                            signUp(
-                                context,
-                                _emailController.text.toString().trim(),
-                                _passwordController.text.toString().trim(),
-                                _usernameController.text.toString().trim(),
-                                _phoneController.text.toString().trim());
-                          }
+                    firebaseUIButton(context, 'Login', Colors.white, '',
+                        Colors.deepOrange.withOpacity(0.9), () {
+                      if (_formKey.currentState!.validate()) {
+                        if (_passwordController.text ==
+                            _confirmPasswordController.text) {
+                          signUp(
+                              context,
+                              _emailController.text.toString().trim(),
+                              _passwordController.text.toString().trim(),
+                              _usernameController.text.toString().trim(),
+                              _phoneController.text.toString().trim());
                         }
-                      },
-                      child: const Text('Sign Up'),
-                    ),
+                      }
+                    }),
                   ],
                 ),
               ),

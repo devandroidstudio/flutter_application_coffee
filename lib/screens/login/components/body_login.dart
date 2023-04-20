@@ -50,89 +50,91 @@ class _BodyLoginState extends State<BodyLogin> {
             // ),
             ),
         child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Sign In',
-                style: Theme.of(context)
-                    .textTheme
-                    .headline3!
-                    .copyWith(fontWeight: FontWeight.bold),
-              ),
-              Form(
-                key: formKey,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: size.height * 0.02,
-                    ),
-                    ReuseableTextFormField(
-                        text: 'Email',
-                        icon: Icons.email,
-                        isPasswordType: false,
-                        controller: _emaiilController),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    ReuseableTextFormField(
-                        text: 'Password',
-                        icon: Icons.lock,
-                        isPasswordType: true,
-                        controller: _passwordController),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    firebaseUIButton(context, 'Login', Colors.white, '',
-                        Colors.deepOrange.withOpacity(0.9), () {
-                      if (formKey.currentState!.validate()) {
-                        KeyboardUtil.hideKeyboard(context);
-                        signIn(
-                          context,
-                          _emaiilController.text.toString().trim(),
-                          _passwordController.text.toString().trim(),
-                          () {
-                            box.put('first', 'firstLogin');
-                          },
-                        );
-                      }
-                    }),
-                    firebaseUIButton(context, 'Google', Colors.black,
-                        'assets/icons/google.png', Colors.white, () {
-                      signInWithGoogle();
-                    }),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    RichText(
-                        text: TextSpan(
-                      text: 'Don\'t have an account? ',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: size.height * 0.02,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: 'Sign Up',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.blue,
-                            fontSize: size.height * 0.025,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = widget.onPressed,
-                        ),
-                      ],
-                    )),
-                  ],
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Sign In',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline3!
+                      .copyWith(fontWeight: FontWeight.bold),
                 ),
-              ),
-            ],
+                Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: size.height * 0.02,
+                      ),
+                      ReuseableTextFormField(
+                          text: 'Email',
+                          icon: Icons.email,
+                          isPasswordType: false,
+                          controller: _emaiilController),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      ReuseableTextFormField(
+                          text: 'Password',
+                          icon: Icons.lock,
+                          isPasswordType: true,
+                          controller: _passwordController),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      firebaseUIButton(context, 'Login', Colors.white, '',
+                          Colors.deepOrange.withOpacity(0.9), () {
+                        if (formKey.currentState!.validate()) {
+                          KeyboardUtil.hideKeyboard(context);
+                          signIn(
+                            context,
+                            _emaiilController.text.toString().trim(),
+                            _passwordController.text.toString().trim(),
+                            () {
+                              box.put('first', 'firstLogin');
+                            },
+                          );
+                        }
+                      }),
+                      firebaseUIButton(context, 'Google', Colors.black,
+                          'assets/icons/google.png', Colors.white, () {
+                        signInWithGoogle();
+                      }),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      RichText(
+                          text: TextSpan(
+                        text: 'Don\'t have an account? ',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: size.height * 0.02,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Sign Up',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.blue,
+                              fontSize: size.height * 0.025,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = widget.onPressed,
+                          ),
+                        ],
+                      )),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
